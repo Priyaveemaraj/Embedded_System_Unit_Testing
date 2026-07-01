@@ -1,0 +1,33 @@
+---
+:source:
+  :file: test/test_bit_manipulation.c
+  :dirname: test
+  :basename: test_bit_manipulation.c
+:successes:
+- :test: test_do_bit_man_invalid_position_high
+  :line: 21
+  :message: ''
+  :unity_test_time: 0
+- :test: test_do_bit_man_invalid_position_negative
+  :line: 34
+  :message: ''
+  :unity_test_time: 0
+- :test: test_do_bit_man_valid_position_temp_low
+  :line: 47
+  :message: ''
+  :unity_test_time: 0
+- :test: test_do_bit_man_valid_position_temp_high
+  :line: 64
+  :message: ''
+  :unity_test_time: 0
+:failures: []
+:ignores: []
+:counts:
+  :total: 4
+  :passed: 4
+  :failed: 0
+  :ignored: 0
+:stdout:
+- Temperature is Low
+- Temperature is High
+:time: 0.6538007999770343
