@@ -1,0 +1,27 @@
+---
+:source:
+  :file: test/test_IBUS.c
+  :dirname: test
+  :basename: test_IBUS.c
+:successes:
+- :test: test_1_ibusInitialize_arms_DMA_reception
+  :line: 53
+  :message: ''
+  :unity_test_time: 0
+- :test: test_2_ibusUpdateData_reports_failsafe_when_no_packet_received_yet
+  :line: 69
+  :message: ''
+  :unity_test_time: 0
+- :test: test_3_ibusCallback_records_timestamp_and_rearms_DMA
+  :line: 91
+  :message: ''
+  :unity_test_time: 0
+:failures: []
+:ignores: []
+:counts:
+  :total: 3
+  :passed: 3
+  :failed: 0
+  :ignored: 0
+:stdout: []
+:time: 0.36863079998875037

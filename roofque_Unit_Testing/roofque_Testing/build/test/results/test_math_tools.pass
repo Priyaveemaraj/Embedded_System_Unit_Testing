@@ -1,0 +1,39 @@
+---
+:source:
+  :file: test/test_math_tools.c
+  :dirname: test
+  :basename: test_math_tools.c
+:successes:
+- :test: test_map_midpoint_maps_to_zero
+  :line: 22
+  :message: ''
+  :unity_test_time: 0
+- :test: test_map_minimum_input_maps_to_minimum_output
+  :line: 28
+  :message: ''
+  :unity_test_time: 0
+- :test: test_map_maximum_input_maps_to_maximum_output
+  :line: 34
+  :message: ''
+  :unity_test_time: 0
+- :test: test_map_quarter_point_scales_proportionally
+  :line: 40
+  :message: ''
+  :unity_test_time: 0
+- :test: test_map_three_quarter_point_scales_proportionally
+  :line: 46
+  :message: ''
+  :unity_test_time: 0
+- :test: test_map_full_scale_range_MESSAGE_example
+  :line: 54
+  :message: ''
+  :unity_test_time: 0
+:failures: []
+:ignores: []
+:counts:
+  :total: 6
+  :passed: 6
+  :failed: 0
+  :ignored: 0
+:stdout: []
+:time: 0.2628683000220917

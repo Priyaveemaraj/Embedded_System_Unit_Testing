@@ -1,0 +1,31 @@
+---
+:source:
+  :file: test/test_controller.c
+  :dirname: test
+  :basename: test_controller.c
+:successes:
+- :test: test_controller_stops_all_motors_when_failsafe_engaged
+  :line: 98
+  :message: ''
+  :unity_test_time: 0
+- :test: test_controller_drives_motors_at_zero_when_sticks_centered_and_brush_off
+  :line: 133
+  :message: ''
+  :unity_test_time: 0
+- :test: test_controller_turns_on_brush_and_pump_when_brush_switch_on
+  :line: 173
+  :message: ''
+  :unity_test_time: 0
+- :test: test_controller_stops_all_motors_when_machine_switched_off
+  :line: 212
+  :message: ''
+  :unity_test_time: 0
+:failures: []
+:ignores: []
+:counts:
+  :total: 4
+  :passed: 4
+  :failed: 0
+  :ignored: 0
+:stdout: []
+:time: 0.3033082000329159
