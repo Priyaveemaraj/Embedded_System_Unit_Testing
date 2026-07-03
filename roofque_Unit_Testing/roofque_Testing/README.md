@@ -1,13 +1,13 @@
-# robot_controller_tests — Ceedling + Unity + CMock for your actual project
+robot_controller_tests — Ceedling + Unity + CMock for the actual project
 
-Ungal `controller.c`, `PMDC`, `IBUS`, `Logger`, `math_tools`, `CAL` (Common
-Abstraction Layer) files ah base pannitu, oru real Ceedling test project
-build panniten — `simple_prog` demo la irundha exact same pattern
-(PPT-3 Unity assertions + PPT-4 CMock mocking).
+This test suite was built around the real project files — controller.c,
+PMDC, IBUS, Logger, math_tools, and CAL (Common Abstraction
+Layer) — using a real Ceedling test project. It follows the same pattern
+demonstrated in the simple_prog example (PPT-3 Unity assertions +
+PPT-4 CMock mocking).
 
-## Folder Structure (ungal real project ah exact ah mirror pannirukku)
+Folder Structure (mirrors the real project structure)
 
-```
 robot_controller_tests/
 ├── project.yml
 ├── src/
@@ -33,116 +33,115 @@ robot_controller_tests/
     └── support/
         ├── stm32g0xx_hal.h  ← TEST-ONLY fake HAL header (see below)
         └── gpio.h           ← TEST-ONLY stub for CubeMX gpio.h
-```
 
-## Why the fake `stm32g0xx_hal.h` and `gpio.h`?
+Why the fake stm32g0xx_hal.h and gpio.h?
 
-Ungal `CAL.h` real STM32 hardware SDK (`stm32g0xx_hal.h`) expect pannudhu.
-Adhu unga IDE (STM32CubeIDE) la irukkum, aana namba idha **PC-la, GCC vachu**
-compile pannurom (unit tests hardware la run pannradhu illa — CPU la
-directly run pannurom, adhukaga real hardware types theva illa).
+The real CAL.h expects the actual STM32 hardware SDK
+(stm32g0xx_hal.h), which is normally provided by STM32CubeIDE.
+Since these unit tests run on a PC using GCC (not on real hardware),
+the real HAL types are not available and are not needed — the tests
+never touch real registers.
 
-Adhanala `test/support/stm32g0xx_hal.h` nu oru **minimal stub** create
-panniten — `GPIO_TypeDef`, `TIM_HandleTypeDef`, `UART_HandleTypeDef` mudhaliya
-types ah "opaque" (empty) struct ah declare pannirukku. Idhu real hardware
-register layout theva illa, enna vena — namba andha pointers ah
-**dereference pannave maatom**, andha work ellam CMock mock pannitu
-irukkum (`CAL_GPIO_Write`, `CAL_PWM_SetDutyCycle` mudhaliyavai).
+To solve this, test/support/stm32g0xx_hal.h defines a minimal stub:
+types like GPIO_TypeDef, TIM_HandleTypeDef, and UART_HandleTypeDef
+are declared as simple structs. The actual register layout doesn't
+matter here, because these pointers are never dereferenced — all
+real hardware interaction is mocked out by CMock
+(CAL_GPIO_Write, CAL_PWM_SetDutyCycle, etc.).
 
-**Idhu real firmware build ku use pannadheenga** — idhu `test/support/`
-folder la mattum irukku, so `ceedling test:all` run pannumbodhu mattum
-pick aagum. Unga real STM32CubeIDE project andha real HAL header ah
-already use pannikittu irukku, ithoda edhavum touch pannaadhu.
+This stub is never used in the real firmware build. It lives only
+inside test/support/, so it's only picked up when running
+ceedling test:all. The real STM32CubeIDE project continues to use the
+actual HAL header and is completely unaffected by this file.
 
-## Setup
+Setup
 
-Munnadi share panna `simple_prog` mari:
+Same as the earlier simple_prog example:
 
-```
-sudo apt-get install ruby build-essential
+bashsudo apt-get install ruby build-essential
 gem install ceedling
-```
 
-## Run pannradhu
+Running the tests
 
-```
-cd robot_controller_tests
+bashcd robot_controller_tests
 ceedling test:all
-```
 
-## Ovvoru module-ku enna test pannirukom?
+What each module tests
 
-### 1. `math_tools.c` — Pure logic, mocking venaame illa
-`map()` function ku edhavadhu hardware dependency illa (`CAL.h`
-include pannala), so straight ah `TEST_ASSERT_EQUAL_INT` use panni
-5 test cases eludhirukom — controller.c la use pannra exact range
-(1000-2000 → -100 to +100) vachu.
+1. math_tools.c — Pure logic, no mocking needed
 
-### 2. `PMDC.c` — CMock mocks `CAL_GPIO` + `CAL_PWM`
-`PMDC_init`, `PMDC_setDutyCycle` (forward/reverse/stop),
-`PMDC_Stop`, `PMDC_Destroy` — ellathukkum, real motor hardware
-touch pannama, `CAL_GPIO_Write_ExpectAndReturn(...)` matrum
-`CAL_PWM_SetDutyCycle_ExpectAndReturn(...)` vachu exact call order &
-arguments verify pannirukom (`enforce_strict_ordering: TRUE` project.yml
-la set pannirukken, so wrong order na test fail aagum).
+The map() function has no hardware dependency (doesn't include
+CAL.h), so it's tested directly with TEST_ASSERT_EQUAL_INT across
+5 test cases, using the exact input range used in controller.c
+(1000–2000 → -100 to +100).
 
-**🐛 Testing la kண்டுpidicha oru bug (source touch pannala):**
-`PMDC.c` line 49/58 la:
-```c
-me->currentRPM = (int16_t) ((me->dutyCycle) * (me->maxRPM)) / (100);
-```
-C operator precedence padi, `(int16_t)` cast **division-ku munnadi**
-apply aagudhu — so `dutyCycle * maxRPM` (e.g. 60 × 6000 = 360000)
-`int16_t` range (max 32767) ah **overflow pannitu**, appuram dhaan 100
-ah divide pannudhu. Result: 60% duty ku `currentRPM` **3600 illama 323**
-nu varudhu (wraparound value). Test cases idha current (buggy)
-behavior ku match aagum padி eludhi irukken, oru comment-oda. Idha fix
-pannanuma sonna, sollunga — `(int16_t)((me->dutyCycle * me->maxRPM) / 100)`
-nu bracket ah maathina sari aagidum.
+2. PMDC.c — CMock mocks CAL_GPIO + CAL_PWM
 
-### 3. `IBUS.c` — CMock mocks `CAL_UART` + `CAL_timer`
-`ibusInitialize`, `ibusUpdateData`, `ibusCallback` ku DMA reception &
-timer ticks ah mock pannirukom.
+PMDC_init, PMDC_setDutyCycle (forward/reverse/stop), PMDC_Stop,
+and PMDC_Destroy are all tested without touching real motor hardware.
+CAL_GPIO_Write_ExpectAndReturn(...) and
+CAL_PWM_SetDutyCycle_ExpectAndReturn(...) verify the exact call order
+and arguments (enforce_strict_ordering: TRUE is set in project.yml,
+so calls made in the wrong order will fail the test).
 
-**⚠️ Test order matters here** — `IBUS.c` la `ibus_uart`,
-`new_ibus_data_received` mudhaliyavai `static` (file-scope) variables,
-so test-to-test state persist aagum. Test file la eludhi irukka order
-(`test_1_...`, `test_2_...`, `test_3_...`) follow pannanum. Idha
-better ah panna, `IBUS.c` la oru `ibusReset()` (test-only) function
-add pannalaam — production code ku andha function safe ah irukkum,
-aana test setUp() la call panni fresh state guarantee pannalaam.
+🐛 A bug found during testing (source code was not modified):
+In PMDC.c, lines 49 and 58:
 
-### 4. `Logger.c` — CMock mocks `CAL_UART` + `CAL_timer`
-Log level threshold logic (`log_set_level`) sariya work aaguthaanu,
-matrum message transmit/suppress aaguthaanu verify pannirukom.
+cme->currentRPM = (int16_t) ((me->dutyCycle) * (me->maxRPM)) / (100);
 
-## `controller.c` yaen test pannala?
+Due to C operator precedence, the (int16_t) cast is applied before
+the division. So dutyCycle * maxRPM (e.g. 60 × 6000 = 360000)
+overflows the int16_t range (max 32767) before being divided by 100.
+As a result, at 60% duty cycle, currentRPM comes out as 323 instead
+of 3600 (a wraparound value). The test cases were written to match
+this current (buggy) behavior, with a comment explaining why. If you'd
+like this fixed, the correct fix is:
 
-`initializeAndRunController()` oru **infinite `for(;;)` loop** — idhu
-production firmware ku sariyaanadhu (embedded main loop), aana **unit
-test ah call panna mudiyadhu** because adhu ever return pannadhu!
-Idha test panna, function ah rendu ah split pannanum:
+cme->currentRPM = (int16_t)((me->dutyCycle * me->maxRPM) / 100);
 
-```c
-void controllerInit(void);          // setup once
+(simply moving the cast to apply after the division)
+
+3. IBUS.c — CMock mocks CAL_UART + CAL_timer
+
+ibusInitialize, ibusUpdateData, and ibusCallback are tested with
+mocked DMA reception and timer ticks.
+
+⚠️ Test order matters here — IBUS.c uses static (file-scope)
+variables like ibus_uart and new_ibus_data_received, so state
+persists between tests. The test file relies on running in the order
+they're written (test_1_..., test_2_..., test_3_...). A cleaner
+long-term solution would be to add a test-only ibusReset() function
+to IBUS.c — safe for production, but callable from setUp() to
+guarantee a fresh state before each test.
+
+4. Logger.c — CMock mocks CAL_UART + CAL_timer
+
+Verifies that the log level threshold logic (log_set_level) works
+correctly, and that messages are transmitted or suppressed as expected.
+
+Why isn't controller.c tested?
+
+initializeAndRunController() contains an infinite for(;;) loop —
+correct behavior for production firmware (an embedded main loop), but
+it cannot be called directly from a unit test, since it never
+returns. To make it testable, the function would need to be split:
+
+cvoid controllerInit(void);          // setup once
 void controllerRunOnce(void);       // one iteration of the loop body
-```
 
-appuram `main.c` la:
-```c
-controllerInit();
+and then in main.c:
+
+ccontrollerInit();
 for(;;) { controllerRunOnce(); HAL_Delay(50); }
-```
 
-Idha refactor panna solreengala? Sonna, andha split panni,
-`controllerRunOnce()` ku full test suite (mocking Logger, IBUS,
-PMDC ellam vachu) eludhi tharen.
+If this refactor is approved, a full test suite for
+controllerRunOnce() (mocking Logger, IBUS, and PMDC) can be added.
 
-## Adding more tests
+Adding more tests
 
-Same pattern follow pannunga:
-```c
-#include "unity.h"
+Follow the same pattern:
+
+c#include "unity.h"
 #include "ModuleUnderTest.h"
 #include "mock_Dependency.h"
 
@@ -152,4 +151,3 @@ void test_something(void)
     // call function under test
     // TEST_ASSERT_* the result
 }
-```
