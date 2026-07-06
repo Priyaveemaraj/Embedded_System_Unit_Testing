@@ -1,0 +1,47 @@
+---
+:source:
+  :file: test/test_PMDC.c
+  :dirname: test
+  :basename: test_PMDC.c
+:successes:
+- :test: test_PMDC_init_starts_both_PWM_channels
+  :line: 52
+  :message: ''
+  :unity_test_time: 0
+- :test: test_PMDC_init_NULL_pointer_returns_false
+  :line: 68
+  :message: ''
+  :unity_test_time: 0
+- :test: test_PMDC_setDutyCycle_positive_enables_motor_and_drives_forward
+  :line: 79
+  :message: ''
+  :unity_test_time: 0
+- :test: test_PMDC_setDutyCycle_negative_enables_motor_and_drives_reverse
+  :line: 114
+  :message: ''
+  :unity_test_time: 0
+- :test: test_PMDC_setDutyCycle_zero_stops_motor
+  :line: 134
+  :message: ''
+  :unity_test_time: 0
+- :test: test_PMDC_setDutyCycle_returns_false_for_NULL_pointer
+  :line: 145
+  :message: ''
+  :unity_test_time: 0
+- :test: test_PMDC_Stop_disables_motor_and_zeroes_both_channels
+  :line: 153
+  :message: ''
+  :unity_test_time: 0
+- :test: test_PMDC_Destroy_stops_motor_then_stops_both_PWM_channels
+  :line: 166
+  :message: ''
+  :unity_test_time: 0
+:failures: []
+:ignores: []
+:counts:
+  :total: 8
+  :passed: 8
+  :failed: 0
+  :ignored: 0
+:stdout: []
+:time: 0.00527364099980332

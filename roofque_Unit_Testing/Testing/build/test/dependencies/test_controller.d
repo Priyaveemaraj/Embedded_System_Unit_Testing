@@ -1,0 +1,24 @@
+build/gcov/out/test_controller/test_controller.o: test/test_controller.c \
+ test/support/stm32g0xx_hal.h build/vendor/unity/src/unity.h \
+ build/vendor/unity/src/unity_internals.h ../Application/controller.h \
+ test/support/hal_stubs.h test/support/stm32g0xx_hal.h \
+ ../Application/Modules/Utilities/Logger/Logger.h \
+ ../Application/CAL/CAL.h ../Application/CAL/CAL_GPIO/CAL_GPIO.h \
+ test/support/gpio.h ../Application/CAL/CAL_i2c/CAL_i2c.h \
+ ../Application/CAL/CAL_PWM/CAL_PWM.h \
+ ../Application/CAL/CAL_UART/CAL_UART.h \
+ ../Application/CAL/CAL_timer/CAL_timer.h \
+ ../Application/CAL/CAL_CAN/CAL_CAN.h \
+ ../Application/Modules/Utilities/Tools/math_tools.h \
+ build/test/mocks/test_controller/mock_IBUS.h \
+ ../Application/Modules/COMMS/IBUS/IBUS.h \
+ build/test/mocks/test_controller/mock_PMDC.h \
+ ../Application/Modules/Actuators/PMDC/PMDC.h \
+ build/test/mocks/test_controller/mock_CAL_UART.h \
+ ../Application/CAL/CAL_UART/CAL_UART.h \
+ build/test/mocks/test_controller/mock_CAL_timer.h \
+ ../Application/CAL/CAL_timer/CAL_timer.h \
+ build/test/mocks/test_controller/mock_CAL_GPIO.h \
+ ../Application/CAL/CAL_GPIO/CAL_GPIO.h \
+ build/test/mocks/test_controller/mock_CAL_PWM.h \
+ ../Application/CAL/CAL_PWM/CAL_PWM.h
